@@ -213,6 +213,10 @@ class Game:
             if event.type == pygame.QUIT:
                 running = False
 
+
+            if event.type == pygame.K_ESCAPE:
+                running = False
+
             # time to draw a new frame
             elif event.type == Game.REFRESH:
 

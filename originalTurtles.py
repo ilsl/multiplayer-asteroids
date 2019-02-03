@@ -5,11 +5,6 @@ import random
 import math
 import datetime
 
-from PodSixNet.Connection import ConnectionListener, connection
-
-from time import sleep
-
-from pygame.locals import *
 
 screenMinX = -500
 screenMinY = -500

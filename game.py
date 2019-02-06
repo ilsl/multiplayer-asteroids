@@ -21,16 +21,6 @@ def load_image_convert_alpha(filename):
 def draw_centered(surface1, surface2, position):
     """Draw surface1 onto surface2 with center at position"""
     rect = surface1.get_rect()
-    # pos_0 = int(position[0])
-    # pos_1 = int(position[1])
-    # position = tuple(position)
-    # # print(int(position[0]))
-    # # #print(int(position))
-    # # print(tuple(position))
-    # print(position[0])
-    # print(position[1])
-    position
-
     rect = rect.move(position[0] - rect.width // 2, position[1] - rect.height // 2)
     surface2.blit(surface1, rect)
 
@@ -286,8 +276,8 @@ class Game:
 ####################
 
                         # Send Network Stuff
-                        self.spaceship2.position = self.parse_data(self.send_data())
-                        #print(self.parse_data(self.send_data()))
+                        self.spaceship2.position, self.spaceship2.angle = self.parse_data(self.send_data())
+
 
                 self.draw()
 
@@ -332,13 +322,10 @@ class Game:
         Send my current position to server
         :return: None
         """
-        jsonmessage = {"id": str(self.net.id), "position": self.spaceship.position}
+        jsonmessage = {"id": str(self.net.id), "position": self.spaceship.position,  "angle": self.spaceship.angle}
         print('sending',jsonmessage)
         data = json.dumps(jsonmessage)
 
-        # data = pickle.dumps({"id": str(self.net.id), "position": self.spaceship.position})
-        #print('self.spaceship.position',self.spaceship.position)
-        # data = str(self.net.id) + ":" + str(self.spaceship.position)# + "," + str(self.spaceship.position)
         reply = self.net.send(data.encode())
         return reply
 
@@ -351,13 +338,15 @@ class Game:
         try:
             data_arr = json.loads(data.decode())
             # d = data.split(":")[1]#.split(",")
-            # listeralvalue=u'{}'.format(d)
-            # X = ast.literal_eval(listeralvalue)
+            listeralvalue=u'{}'.format(data_arr)
+            data_arr= ast.literal_eval(listeralvalue)
             # print(X)
-            print('recieving',data_arr)
-            return data_arr['position']
+            print('receiving',data_arr)
+
+            response = (data_arr['position'], data_arr['angle'])
+            return response
         except:
-            return (0,0)
+            return (0,0), 0
 
     def rocks_physics(self):
         """Move the rocks if there are any"""

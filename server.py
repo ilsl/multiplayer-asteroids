@@ -1,6 +1,7 @@
 import socket
 from _thread import *
 import json
+import ast
 
 # create an INET, STREAMing socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,9 +23,11 @@ s.listen(2)
 print("Waiting for a connection")
 
 currentId = "0"
+pos = [{"id": 0, "position": [400.0, 300.0]},
+       {"id": 1, "position": [100.0, 200.0]}]
 
 def threaded_client(conn):
-    global currentId
+    global currentId, pos
     conn.send(str.encode(currentId))
     currentId = "1"
     reply = ''
@@ -32,7 +35,6 @@ def threaded_client(conn):
         try:
             data = conn.recv(4096)
             reply = data
-            # reply = data.decode('utf-8')
             if not data:
                 conn.send(str.encode("Goodbye"))
                 break
@@ -41,12 +43,15 @@ def threaded_client(conn):
                 dataid = json.loads(dataid)
                 id = dataid['id']
                 id = int(id[2])
-                # pos[id] = reply
-                if id == 0: nid = 1
-                if id == 1: nid = 0
+                print('pos',pos)
+                pos[id] = reply
 
-                jsonmessage = {"id": nid, "position": dataid["position"]}
-                reply = json.dumps(jsonmessage)
+                if id == 0: reply = pos[1]
+                if id == 1: reply = pos[0]
+
+                if type(reply) == bytes:
+                    reply =reply.decode("utf-8")
+                reply = json.dumps(reply)
                 reply = reply.encode()
 
             conn.sendall(reply)

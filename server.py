@@ -46,6 +46,7 @@ def threaded_client(conn):
                 print('pos',pos)
                 pos[id] = reply
 
+                # Use the alternative id to the one recieved as this will be the other players response.
                 if id == 0: reply = pos[1]
                 if id == 1: reply = pos[0]
 

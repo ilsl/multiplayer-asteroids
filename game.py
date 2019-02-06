@@ -5,6 +5,8 @@ import datetime
 import random
 import os
 import ast
+import pickle
+import json
 
 ##################################
 # General Helper functions (START)
@@ -27,6 +29,7 @@ def draw_centered(surface1, surface2, position):
     # # print(tuple(position))
     # print(position[0])
     # print(position[1])
+    position
 
     rect = rect.move(position[0] - rect.width // 2, position[1] - rect.height // 2)
     surface2.blit(surface1, rect)
@@ -329,9 +332,14 @@ class Game:
         Send my current position to server
         :return: None
         """
+        jsonmessage = {"id": str(self.net.id), "position": self.spaceship.position}
+        print('sending',jsonmessage)
+        data = json.dumps(jsonmessage)
+
+        # data = pickle.dumps({"id": str(self.net.id), "position": self.spaceship.position})
         #print('self.spaceship.position',self.spaceship.position)
-        data = str(self.net.id) + ":" + str(self.spaceship.position)# + "," + str(self.spaceship.position)
-        reply = self.net.send(data)
+        # data = str(self.net.id) + ":" + str(self.spaceship.position)# + "," + str(self.spaceship.position)
+        reply = self.net.send(data.encode())
         return reply
 
     @staticmethod
@@ -341,12 +349,13 @@ class Game:
         :return: None
         """
         try:
-            d = data.split(":")[1]#.split(",")
-            listeralvalue=u'{}'.format(d)
-            X = ast.literal_eval(listeralvalue)
-            print(X)
-            print(u'd')
-            return X#, int(d[1])
+            data_arr = json.loads(data.decode())
+            # d = data.split(":")[1]#.split(",")
+            # listeralvalue=u'{}'.format(d)
+            # X = ast.literal_eval(listeralvalue)
+            # print(X)
+            print('recieving',data_arr)
+            return data_arr['position']
         except:
             return (0,0)
 
@@ -373,6 +382,56 @@ class Game:
                     self.rocks.remove(rock)
                     if len(self.rocks) < 10:
                         self.make_rock(rock.size)
+
+    def missiles_physics(self):
+        """Do all the physics of missiles"""
+
+        # if there are any active missiles
+        if len(self.spaceship.active_missiles) > 0:
+            for missile in self.spaceship.active_missiles:
+                # move the missile
+                missile.move()
+
+                # check the collision with each rock
+                for rock in self.rocks:
+                    if rock.size == "big":
+                        # if the missile hits a big rock, destroy it,
+                        # make two medium sized rocks and give 20 scores
+                        if distance(missile.position, rock.position) < 80:
+                            self.rocks.remove(rock)
+                            if missile in self.spaceship.active_missiles:
+                                self.spaceship.active_missiles.remove(missile)
+                            self.make_rock("normal", \
+                                           (rock.position[0] + 10, rock.position[1]))
+                            self.make_rock("normal", \
+                                           (rock.position[0] - 10, rock.position[1]))
+                            self.score += 20
+
+                    elif rock.size == "normal":
+                        # if the missile hits a medium sized rock, destroy it,
+                        # make two small sized rocks and give 50 scores
+                        if distance(missile.position, rock.position) < 55:
+                            self.rocks.remove(rock)
+                            if missile in self.spaceship.active_missiles:
+                                self.spaceship.active_missiles.remove(missile)
+                            self.make_rock("small", \
+                                           (rock.position[0] + 10, rock.position[1]))
+                            self.make_rock("small", \
+                                           (rock.position[0] - 10, rock.position[1]))
+                            self.score += 50
+                    else:
+                        # if the missile hits a small rock, destroy it,
+                        # make one big rock if there are less than 10 rocks
+                        # on the screen, and give 100 scores
+                        if distance(missile.position, rock.position) < 30:
+                            self.rocks.remove(rock)
+                            if missile in self.spaceship.active_missiles:
+                                self.spaceship.active_missiles.remove(missile)
+
+                            if len(self.rocks) < 10:
+                                self.make_rock()
+
+                            self.score += 100
 
     def physics(self):
         """Do spaceship physics here"""

@@ -23,8 +23,24 @@ s.listen(2)
 print("Waiting for a connection")
 
 currentId = "0"
-pos = [{"id": 0, "position": [400.0, 300.0]},
-       {"id": 1, "position": [100.0, 200.0]}]
+rockdict = {}
+#for number of x rocks
+for r in range(20):
+    positionjson = "rocksposition_" + str(r)
+    speedjson = "rockspeed_" + str(r)
+    sizejson = "rocksize_" + str(r)
+    directionjson = "rockdirection_" + str(r)
+    jsonmessage = {positionjson: [67, 157], speedjson:4, sizejson:'big', directionjson: [0.2, 0.4]}
+    rockdict = {**jsonmessage, **rockdict}
+
+pos1 = {"id": 0, "position": [400.0, 300.0], 'angle': 0}#, 'rocksposition': [67, 157], 'rockspeed': 4, 'rocksize': 'big', 'rockdirection':[67, 157]},
+pos2 = {"id": 1, "position": [100.0, 200.0], 'angle': 0}#, 'rocksposition': [67, 157], 'rockspeed': 4, 'rocksize': 'big', 'rockdirection':[67, 157]}]
+
+pos1 = {**pos1, **rockdict}
+pos2 = {**pos2, **rockdict}
+print(pos1)
+print(pos2)
+pos = [pos1, pos2]
 
 def threaded_client(conn):
     global currentId, pos

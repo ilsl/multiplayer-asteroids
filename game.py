@@ -265,7 +265,30 @@ class Game:
                         # if there are any missiles on the screen, process them
                         if len(self.spaceship.active_missiles) > 0:
                             self.missiles_physics()
+####################
 
+                        # Send Network Stuff
+                        # self.spaceship2.position, self.spaceship2.angle,\
+                        # self.rocks[0].position,  self.rocks[0].speed,\
+                        # self.rocks[0].size, self.rocks[0].direction \
+                        #     = self.parse_data(self, data=self.send_data())
+                        parsedvalues = self.parse_data(self, data=self.send_data())
+                        self.spaceship2.position = parsedvalues['position']
+                        self.spaceship2.angle = parsedvalues['angle']
+                        for r in range(len(self.rocks)):
+                            positionjson = "rocksposition_" + str(r)
+                            speedjson = "rockspeed_" + str(r)
+                            sizejson = "rocksize_" + str(r)
+                            directionjson = "rockdirection_" + str(r)
+                            self.rocks[r].position = parsedvalues[positionjson]
+                            self.rocks[r].speed = parsedvalues[speedjson]
+                            self.rocks[r].size = parsedvalues[sizejson]
+                            self.rocks[r].direction = parsedvalues[directionjson]
+
+
+                        # rockdict = {}
+                        # for r in range(len(self.rocks)):
+                        #
                         # if there are any rocks, do their physics
                         if len(self.rocks) > 0:
                             self.rocks_physics()
@@ -273,10 +296,6 @@ class Game:
                         # do the spaceship physics
                         self.physics()
 
-####################
-
-                        # Send Network Stuff
-                        self.spaceship2.position, self.spaceship2.angle = self.parse_data(self.send_data())
 
 
                 self.draw()
@@ -322,31 +341,62 @@ class Game:
         Send my current position to server
         :return: None
         """
-        jsonmessage = {"id": str(self.net.id), "position": self.spaceship.position,  "angle": self.spaceship.angle}
-        print('sending',jsonmessage)
-        data = json.dumps(jsonmessage)
+        # print( "Full JSON")
+        # print(json.dumps(self.rocks[0].reprJSON(), cls=ComplexEncoder))
+
+        rockdict = {}
+        for r in range(len(self.rocks)):
+
+            positionjson = "rocksposition_" + str(r)
+            speedjson = "rockspeed_" + str(r)
+            sizejson = "rocksize_" + str(r)
+            directionjson = "rockdirection_" + str(r)
+
+            rockjson = {positionjson:  self.rocks[r].position, speedjson:self.rocks[r].speed, sizejson:self.rocks[r].size,
+                        directionjson:self.rocks[r].direction}
+            rockdict = {**rockjson, **rockdict}
+            # "rocksposition": self.rocks[r].position, "rockspeed": self.rocks[r].speed, "rocksize": self.rocks[r].size,
+            # "rockdirection": self.rocks[r].direction
+
+            jsonmessage = {"id": str(self.net.id), "position": self.spaceship.position,  "angle": self.spaceship.angle}
+            # Merge the two python dictionaries
+            z = {**jsonmessage, **rockdict}
+
+        print('sending',z)
+        data = json.dumps(z)
 
         reply = self.net.send(data.encode())
         return reply
 
     @staticmethod
-    def parse_data(data):
+    def parse_data(self, data):
         """
         Get data from server. player 2 position
         :return: None
         """
+        initialdict = {}
         try:
+
             data_arr = json.loads(data.decode())
             # d = data.split(":")[1]#.split(",")
             listeralvalue=u'{}'.format(data_arr)
             data_arr= ast.literal_eval(listeralvalue)
             # print(X)
             print('receiving',data_arr)
-
-            response = (data_arr['position'], data_arr['angle'])
-            return response
+            # for r in range(len(self.rocks)):
+            #     positionjson = "rocksposition_" + str(r)
+            #     speedjson = "rockspeed_" + str(r)
+            #     sizejson = "rocksize_" + str(r)
+            #     directionjson = "rockdirection_" + str(r)
+            #     rockjson = {data_arr[positionjson], data_arr[speedjson],data_arr[sizejson], data_arr[directionjson]}
+            #     initialdict = {**rockjson, **initialdict}
+            #
+            # response = (data_arr['position'], data_arr['angle'])
+            # z = {**response, **initialdict}
+            # print('receiving2', z)
+            return data_arr
         except:
-            return (0,0), 0
+            return (0,0), 0, (0,0), 0, (0,0)
 
     def rocks_physics(self):
         """Move the rocks if there are any"""
@@ -649,3 +699,13 @@ class Rock(GameObject):
 
         self.position[0] += self.direction[0] * self.speed
         self.position[1] += self.direction[1] * self.speed
+
+    def reprJSON(self):
+        return dict(position=self.position, direction=self.direction, size=self.size)
+
+class ComplexEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'reprJSON'):
+            return obj.reprJSON()
+        else:
+            return json.JSONEncoder.default(self, obj)

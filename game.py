@@ -264,14 +264,12 @@ class Game:
 
                         # if there are any missiles on the screen, process them
                         if len(self.spaceship.active_missiles) > 0:
+                            print('self.spaceship.active_missiles', self.spaceship.active_missiles[0].__dict__)
+
                             self.missiles_physics()
 ####################
 
                         # Send Network Stuff
-                        # self.spaceship2.position, self.spaceship2.angle,\
-                        # self.rocks[0].position,  self.rocks[0].speed,\
-                        # self.rocks[0].size, self.rocks[0].direction \
-                        #     = self.parse_data(self, data=self.send_data())
                         parsedvalues = self.parse_data(self, data=self.send_data())
                         self.spaceship2.position = parsedvalues['position']
                         self.spaceship2.angle = parsedvalues['angle']
@@ -280,17 +278,18 @@ class Game:
                             speedjson = "rockspeed_" + str(r)
                             sizejson = "rocksize_" + str(r)
                             directionjson = "rockdirection_" + str(r)
-                            self.rocks[r].position = parsedvalues[positionjson]
-                            self.rocks[r].speed = parsedvalues[speedjson]
-                            self.rocks[r].size = parsedvalues[sizejson]
-                            self.rocks[r].direction = parsedvalues[directionjson]
+                            try:
+                                self.rocks[r].position = parsedvalues[positionjson]
+                                self.rocks[r].speed = parsedvalues[speedjson]
+                                self.rocks[r].size = parsedvalues[sizejson]
+                                self.rocks[r].direction = parsedvalues[directionjson]
+                            except KeyError:
+                                #Rock r doesn't exist yet
+                                pass
 
-
-                        # rockdict = {}
-                        # for r in range(len(self.rocks)):
-                        #
                         # if there are any rocks, do their physics
                         if len(self.rocks) > 0:
+
                             self.rocks_physics()
 
                         # do the spaceship physics
@@ -355,8 +354,6 @@ class Game:
             rockjson = {positionjson:  self.rocks[r].position, speedjson:self.rocks[r].speed, sizejson:self.rocks[r].size,
                         directionjson:self.rocks[r].direction}
             rockdict = {**rockjson, **rockdict}
-            # "rocksposition": self.rocks[r].position, "rockspeed": self.rocks[r].speed, "rocksize": self.rocks[r].size,
-            # "rockdirection": self.rocks[r].direction
 
             jsonmessage = {"id": str(self.net.id), "position": self.spaceship.position,  "angle": self.spaceship.angle}
             # Merge the two python dictionaries
@@ -374,29 +371,28 @@ class Game:
         Get data from server. player 2 position
         :return: None
         """
-        initialdict = {}
         try:
 
             data_arr = json.loads(data.decode())
-            # d = data.split(":")[1]#.split(",")
             listeralvalue=u'{}'.format(data_arr)
             data_arr= ast.literal_eval(listeralvalue)
-            # print(X)
-            print('receiving',data_arr)
-            # for r in range(len(self.rocks)):
-            #     positionjson = "rocksposition_" + str(r)
-            #     speedjson = "rockspeed_" + str(r)
-            #     sizejson = "rocksize_" + str(r)
-            #     directionjson = "rockdirection_" + str(r)
-            #     rockjson = {data_arr[positionjson], data_arr[speedjson],data_arr[sizejson], data_arr[directionjson]}
-            #     initialdict = {**rockjson, **initialdict}
-            #
-            # response = (data_arr['position'], data_arr['angle'])
-            # z = {**response, **initialdict}
-            # print('receiving2', z)
-            return data_arr
+            dictfilt = lambda x, y: dict([(i, x[i]) for i in x if i in set(y)])
+            print('data_arr[id', data_arr['id'])
+            if data_arr['id'] == 1 or data_arr['id'] == b'1' or data_arr['id'] == "b'1'":
+                # wanted_keys = ("position", "angle")
+                print(1)
+                data_arr_filtered = {'position': data_arr['position'], 'angle': data_arr['angle']}
+                print('receiving1', data_arr_filtered)
+
+                return data_arr_filtered
+            else:
+                print('receiving2', data_arr)
+                print('data_arr', data_arr['position'])
+                return data_arr
+
         except:
-            return (0,0), 0, (0,0), 0, (0,0)
+            data_arr_filtered = {'position': data_arr['position'], 'angle': data_arr['angle']}
+            return data_arr_filtered
 
     def rocks_physics(self):
         """Move the rocks if there are any"""

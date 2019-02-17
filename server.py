@@ -30,11 +30,20 @@ for r in range(20):
     speedjson = "rockspeed_" + str(r)
     sizejson = "rocksize_" + str(r)
     directionjson = "rockdirection_" + str(r)
-    jsonmessage = {positionjson: [67, 157], speedjson:4, sizejson:'big', directionjson: [0.2, 0.4]}
+    jsonmessage = {positionjson: [67, 157], speedjson: 4, sizejson: 'big', directionjson: [0.2, 0.4]}
     rockdict = {**jsonmessage, **rockdict}
 
-pos1 = {"id": 0, "position": [400.0, 300.0], 'angle': 0}#, 'rocksposition': [67, 157], 'rockspeed': 4, 'rocksize': 'big', 'rockdirection':[67, 157]},
-pos2 = {"id": 1, "position": [100.0, 200.0], 'angle': 0}#, 'rocksposition': [67, 157], 'rockspeed': 4, 'rocksize': 'big', 'rockdirection':[67, 157]}]
+missiledict = {}
+#for number of x rocks
+for r in range(20):
+    missileposition = "missileposition_" + str(r)
+    missilespeed = "missilespeed_" + str(r)
+    missiledirection = "missiledirection_" + str(r)
+    jsonmissile = {missileposition: [67, 157], missilespeed: 4, missiledirection: [0.2, 0.4]}
+    rockdict = {**jsonmissile, **missiledict}
+
+pos1 = {"id": 0, "position": [400.0, 300.0], 'angle': 0}
+pos2 = {"id": 1, "position": [100.0, 200.0], 'angle': 0}
 
 pos1 = {**pos1, **rockdict}
 pos2 = {**pos2, **rockdict}
@@ -62,7 +71,7 @@ def threaded_client(conn):
                 print('pos',pos)
                 pos[id] = reply
 
-                # Use the alternative id to the one recieved as this will be the other players response.
+                # Use the alternative id to the one received as this will be the other players response.
                 if id == 0: reply = pos[1]
                 if id == 1: reply = pos[0]
 

@@ -262,12 +262,7 @@ class Game:
                                 self.spaceship.speed -= 1
                             self.spaceship.is_throttle_on = False
 
-                        # if there are any missiles on the screen, process them
-                        if len(self.spaceship.active_missiles) > 0:
-                            print('self.spaceship.active_missiles', self.spaceship.active_missiles[0].__dict__)
 
-                            self.missiles_physics()
-####################
 
                         # Send Network Stuff
                         parsedvalues = self.parse_data(self, data=self.send_data())
@@ -287,6 +282,20 @@ class Game:
                                 #Rock r doesn't exist yet
                                 pass
 
+                        for r in range(len(self.spaceship.active_missiles)):
+                            missileposition = "missileposition_" + str(r)
+                            missilespeed = "missilespeed_" + str(r)
+                            missilesize = "missilesize_" + str(r)
+                            missiledirection = "missiledirection_" + str(r)
+                            try:
+                                self.spaceship.active_missiles[r].position = parsedvalues[missileposition]
+                                self.spaceship.active_missiles[r].speed = parsedvalues[missilespeed]
+                                # self.spaceship.active_missiles[r].size = parsedvalues[missilesize]
+                                self.spaceship.active_missiles[r].direction = parsedvalues[missiledirection]
+                            except KeyError:
+                                #Missile r doesn't exist yet
+                                pass
+
                         # if there are any rocks, do their physics
                         if len(self.rocks) > 0:
 
@@ -295,6 +304,10 @@ class Game:
                         # do the spaceship physics
                         self.physics()
 
+                        # if there are any missiles on the screen, process them
+                        if len(self.spaceship.active_missiles) > 0:
+                            self.missiles_physics()
+                ####################
 
 
                 self.draw()
@@ -344,6 +357,7 @@ class Game:
         # print(json.dumps(self.rocks[0].reprJSON(), cls=ComplexEncoder))
 
         rockdict = {}
+        missiledict = {}
         for r in range(len(self.rocks)):
 
             positionjson = "rocksposition_" + str(r)
@@ -356,8 +370,19 @@ class Game:
             rockdict = {**rockjson, **rockdict}
 
             jsonmessage = {"id": str(self.net.id), "position": self.spaceship.position,  "angle": self.spaceship.angle}
-            # Merge the two python dictionaries
-            z = {**jsonmessage, **rockdict}
+
+        for r in range(len(self.spaceship.active_missiles)):
+            missileposition = "missileposition_" + str(r)
+            missilespeed = "missilespeed_" + str(r)
+            missiledirection = "missiledirection_" + str(r)
+
+            missilejson = {missileposition:  self.spaceship.active_missiles[r].position, missilespeed:self.spaceship.active_missiles[r].speed,
+                          missiledirection: self.spaceship.active_missiles[r].direction}
+
+            missiledict = {**missilejson, **missiledict}
+
+        # Merge the three python dictionaries
+        z = {**jsonmessage, **rockdict, **missiledict}
 
         print('sending',z)
         data = json.dumps(z)
@@ -372,22 +397,20 @@ class Game:
         :return: None
         """
         try:
-
             data_arr = json.loads(data.decode())
             listeralvalue=u'{}'.format(data_arr)
             data_arr= ast.literal_eval(listeralvalue)
-            dictfilt = lambda x, y: dict([(i, x[i]) for i in x if i in set(y)])
-            print('data_arr[id', data_arr['id'])
+
+            # If id = other player than don't update include their rock positions, but do include ship and bullet positions.
             if data_arr['id'] == 1 or data_arr['id'] == b'1' or data_arr['id'] == "b'1'":
-                # wanted_keys = ("position", "angle")
-                print(1)
-                data_arr_filtered = {'position': data_arr['position'], 'angle': data_arr['angle']}
+                data_arr_filtered = {'position': data_arr['position'], 'angle': data_arr['angle'],
+                                 'missileposition_': data_arr['missileposition_'], 'missilespeed_': data_arr['missilespeed_'],
+                                 'missiledirection_': data_arr['missiledirection_']}
                 print('receiving1', data_arr_filtered)
 
                 return data_arr_filtered
             else:
                 print('receiving2', data_arr)
-                print('data_arr', data_arr['position'])
                 return data_arr
 
         except:

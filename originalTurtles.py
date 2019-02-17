@@ -4,6 +4,8 @@ import tkinter
 import random
 import math
 import datetime
+from network import Network
+
 
 
 screenMinX = -500
@@ -140,6 +142,7 @@ def intersect(object1, object2):
 
 def main():
     # Start by creating a RawTurtle object for the window.
+    net = Network()
     root = tkinter.Tk()
     root.title("Isobels Multiplayer Implementation of Asteroids!")
     cv = ScrolledCanvas(root, 600, 600, 600, 600)
@@ -247,7 +250,7 @@ def main():
     ship = SpaceShip(cv, 0, 0, (screenMaxX - screenMinX) / 3 + screenMinX, (screenMaxY - screenMinY) / 2 + screenMinY, "red")
 
     ship2 = SpaceShip(cv, 0, 0, (screenMaxX - screenMinX) / -3 + screenMinX, (screenMaxY - screenMinY) / 2 + screenMinY, "green")
-
+    # print(ship2.__dict__)
     asteroids = []
     bullets = []
     bullets2 = []

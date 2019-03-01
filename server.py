@@ -13,7 +13,6 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server = ''
 port = 5555
 
-server_ip = socket.gethostbyname(server)
 
 try:
     # bind the socket to my local host, and a the port we defined in network.py

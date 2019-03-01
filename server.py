@@ -4,19 +4,23 @@ import json
 from multiprocessing import Queue
 import time
 
-class Server():
+
+class Server:
+
+    def __init__(self, port):
+        self.port = port
 
     def create_socket(self):
         # create an INET, STREAMing socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         server = ''
-        port = 5555
+        # port = 5555
 
 
         try:
             # bind the socket to my local host, and a the port we defined in network.py
-            s.bind((server, port))
+            s.bind((server, self.port))
 
         except socket.error as e:
             print(str(e))
@@ -145,11 +149,8 @@ class Server():
         print('Got queue item: %r' % item)
 
 
-
-
-
 if __name__ == "__main__":
-    s = Server()
+    s = Server(5555)
     currentId = "0"
     pos = s.build_object_pos()
     s.create_socket()

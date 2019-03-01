@@ -318,6 +318,10 @@ class Game:
                 pass  # an event type we don't handle
 
     def update_object_positions(self, parsed_values):
+        """
+        Update the spaceship, Missile and Rock positions
+        :return: none
+        """
         self.spaceship2.position = parsed_values['position']
         self.spaceship2.angle = parsed_values['angle']
         for r in range(len(self.rocks)):
@@ -349,10 +353,8 @@ class Game:
     def send_data(self):
         """
         Send my current position to server
-        :return: None
+        :return: byte encoded json
         """
-        # print( "Full JSON")
-        # print(json.dumps(self.rocks[0].reprJSON(), cls=ComplexEncoder))
 
         rockdict = {}
         missiledict = {}
@@ -392,7 +394,7 @@ class Game:
     def parse_data(self, data):
         """
         Get data from server. player 2 position
-        :return: None
+        :return: dictionary
         """
         try:
             data_arr = json.loads(data.decode())

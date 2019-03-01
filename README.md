@@ -1,4 +1,4 @@
-# multiplayer-asteroids
+# 2 Player Asteroids
 
 This game allows 2 players to play against each other on the classic arcade game: asteroids.
 

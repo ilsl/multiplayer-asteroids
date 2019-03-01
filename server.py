@@ -4,29 +4,35 @@ import json
 from multiprocessing import Queue
 import time
 
-def process_queue_item(item):
-    print('Got queue item: %r' % item)
 
-# create an INET, STREAMing socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+def create_socket():
+    # create an INET, STREAMing socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-server = ''
-port = 5555
+    server = ''
+    port = 5555
 
 
-try:
-    # bind the socket to my local host, and a the port we defined in network.py
-    s.bind((server, port))
+    try:
+        # bind the socket to my local host, and a the port we defined in network.py
+        s.bind((server, port))
 
-except socket.error as e:
-    print(str(e))
+    except socket.error as e:
+        print(str(e))
 
-# become a server socket and accept 2 threads
-s.listen(2)
-print("Waiting for a connection")
+    # become a server socket and accept 2 threads
+    s.listen(2)
+    print("Waiting for a connection")
 
-# Set the first Client to connect with an id of 0
-currentId = "0"
+    # Set the first Client to connect with an id of 0
+
+
+    while True:
+        conn, addr = s.accept()
+        print("Connected to: ", addr)
+
+        start_new_thread(threaded_client, (conn,))
+
 
 # The below initialises all objects on screen: Missile, Rock and ship.
 # This for loop creates a key specific to that rock. E.g rock 5 on screen would have a property of rockpositions_5
@@ -60,7 +66,6 @@ def build_object_pos():
     pos = [pos1, pos2]
     return pos
 
-pos = build_object_pos()
 
 def threaded_client(conn):
 
@@ -135,11 +140,18 @@ def threaded_client(conn):
     print("Connection Closed")
     conn.close()
 
-while True:
-    conn, addr = s.accept()
-    print("Connected to: ", addr)
+def process_queue_item(item):
+    print('Got queue item: %r' % item)
 
-    start_new_thread(threaded_client, (conn,))
+
+
+
+
+
+currentId = "0"
+pos = build_object_pos()
+create_socket()
+
 
 
 

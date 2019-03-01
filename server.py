@@ -92,7 +92,7 @@ class Server:
         # send the serialized data across the network
         conn.send(str.encode(currentId))
         # This sets the 2nd Clients id
-        if self.number_of_connections > 2:
+        if self.number_of_connections % 2 == 0:
             currentId = "0"
         else:
             currentId = "1"

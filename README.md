@@ -5,7 +5,9 @@ This game allows 2 players to play against each other on the classic arcade game
 This works on a shared local network but can easily be configured to be hosted. It uses thge following technologies:
 * sockets
 * threads
-* Queue (Artificial Network Delay)
+* Queue (Artificial Network Delay) on server
+* pygame frame rate (Bucket Synchronization) on client
+* Dead Reckoning 
 
 This project uses the code from the following github repository as a base:
 

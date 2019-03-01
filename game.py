@@ -5,8 +5,11 @@ import datetime
 import random
 import os
 import ast
-import pickle
+from delayqueue import DelayQueue
+import time
 import json
+
+
 
 ##################################
 # General Helper functions (START)
@@ -80,6 +83,7 @@ class Game:
         self.playersLabel = "0 players"
         self.frame = 0
         self.down = False
+        self.queue = DelayQueue()
 
         """Initialize a new game"""
         pygame.mixer.init()
@@ -386,6 +390,15 @@ class Game:
 
         print('sending',z)
         data = json.dumps(z)
+
+        # bucket synchronization
+        self.queue.put(data, delay=30)
+        try:
+            data = self.queue.get()
+        except:
+            print('empty')
+            # no output: queue was not empty, so not executed
+
 
         reply = self.net.send(data.encode())
         return reply

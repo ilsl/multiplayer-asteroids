@@ -12,7 +12,10 @@ class Server:
         self.server = server
 
     def create_socket(self):
-        # create an INET, STREAMing socket
+        """
+        Create an INET, STREAMing socket and accept 2 threads
+        :return: none
+        """
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
@@ -35,6 +38,10 @@ class Server:
     # The below initialises all objects on screen: Missile, Rock and ship.
     # This for loop creates a key specific to that rock. E.g rock 5 on screen would have a property of rockpositions_5
     def build_object_pos(self):
+        """
+        Create the dictionary of object positions
+        :return: None
+        """
         rockdict = {}
         for r in range(40):
             positionjson = "rocksposition_" + str(r)
@@ -53,7 +60,6 @@ class Server:
             jsonmissile = {missileposition: [67, 157], missilespeed: 4, missiledirection: [0.2, 0.4]}
             rockdict = {**jsonmissile, **missiledict}
 
-
         pos1 = {"id": 0, "position": [400.0, 300.0], 'angle': 0}
         pos2 = {"id": 1, "position": [100.0, 200.0], 'angle': 0}
 
@@ -64,8 +70,11 @@ class Server:
         pos = [pos1, pos2]
         return pos
 
-
     def threaded_client(self, conn):
+        """
+        Send the data received
+        :return: dictionary
+        """
 
         # Build queue
         queue = Queue()
@@ -148,6 +157,6 @@ if __name__ == "__main__":
     running_server = Server(port=5555, server='')
     # Set the first Client to connect with an id of 0
     currentId = "0"
-    # Get the object positions of a server
+    # Get the object positions of a server`
     pos = running_server.build_object_pos()
     running_server.create_socket()

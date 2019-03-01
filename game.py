@@ -402,7 +402,7 @@ class Game:
             data_arr= ast.literal_eval(listeralvalue)
 
             # If id = other player than don't update include their rock positions, but do include ship and bullet positions.
-            if data_arr['id'] == 1 or data_arr['id'] == b'1' or data_arr['id'] == "b'1'":
+            if data_arr['id'] == 0 or data_arr['id'] == b'0' or data_arr['id'] == "b'0'":
                 data_arr_filtered = {'position': data_arr['position'], 'angle': data_arr['angle'],
                                  'missileposition_': data_arr['missileposition_'], 'missilespeed_': data_arr['missilespeed_'],
                                  'missiledirection_': data_arr['missiledirection_']}

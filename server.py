@@ -31,33 +31,37 @@ currentId = "0"
 
 # The below initialises all objects on screen: Missile, Rock and ship.
 # This for loop creates a key specific to that rock. E.g rock 5 on screen would have a property of rockpositions_5
-rockdict = {}
-for r in range(40):
-    positionjson = "rocksposition_" + str(r)
-    speedjson = "rockspeed_" + str(r)
-    sizejson = "rocksize_" + str(r)
-    directionjson = "rockdirection_" + str(r)
-    jsonmessage = {positionjson: [67, 157], speedjson: 4, sizejson: 'big', directionjson: [0.2, 0.4]}
-    rockdict = {**jsonmessage, **rockdict}
+def build_object_pos():
+    rockdict = {}
+    for r in range(40):
+        positionjson = "rocksposition_" + str(r)
+        speedjson = "rockspeed_" + str(r)
+        sizejson = "rocksize_" + str(r)
+        directionjson = "rockdirection_" + str(r)
+        jsonmessage = {positionjson: [67, 157], speedjson: 4, sizejson: 'big', directionjson: [0.2, 0.4]}
+        rockdict = {**jsonmessage, **rockdict}
 
-missiledict = {}
-# This for loop creates a key specific to that missile. E.g rock 5 on screen would have a property of missilepositions_5
-for r in range(400):
-    missileposition = "missileposition_" + str(r)
-    missilespeed = "missilespeed_" + str(r)
-    missiledirection = "missiledirection_" + str(r)
-    jsonmissile = {missileposition: [67, 157], missilespeed: 4, missiledirection: [0.2, 0.4]}
-    rockdict = {**jsonmissile, **missiledict}
+    missiledict = {}
+    # This for loop creates a key specific to that missile. E.g rock 5 on screen would have a property of missilepositions_5
+    for r in range(400):
+        missileposition = "missileposition_" + str(r)
+        missilespeed = "missilespeed_" + str(r)
+        missiledirection = "missiledirection_" + str(r)
+        jsonmissile = {missileposition: [67, 157], missilespeed: 4, missiledirection: [0.2, 0.4]}
+        rockdict = {**jsonmissile, **missiledict}
 
 
-pos1 = {"id": 0, "position": [400.0, 300.0], 'angle': 0}
-pos2 = {"id": 1, "position": [100.0, 200.0], 'angle': 0}
+    pos1 = {"id": 0, "position": [400.0, 300.0], 'angle': 0}
+    pos2 = {"id": 1, "position": [100.0, 200.0], 'angle': 0}
 
-# Combine all of the dictionarys above
-pos1 = {**pos1, **rockdict}
-pos2 = {**pos2, **rockdict}
+    # Combine all of the dictionarys above
+    pos1 = {**pos1, **rockdict}
+    pos2 = {**pos2, **rockdict}
 
-pos = [pos1, pos2]
+    pos = [pos1, pos2]
+    return pos
+
+pos = build_object_pos()
 
 def threaded_client(conn):
 
@@ -126,7 +130,7 @@ def threaded_client(conn):
         # If we didn't get anything on this loop, sleep for a bit so we
         # don't max out CPU time
         if do_sleep:
-            time.sleep(TIMEOUT)
+            time.sleep(0.1)
 
 
     print("Connection Closed")

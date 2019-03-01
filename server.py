@@ -7,20 +7,17 @@ import time
 
 class Server:
 
-    def __init__(self, port):
+    def __init__(self, port, server):
         self.port = port
+        self.server = server
 
     def create_socket(self):
         # create an INET, STREAMing socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        server = ''
-        # port = 5555
-
-
         try:
             # bind the socket to my local host, and a the port we defined in network.py
-            s.bind((server, self.port))
+            s.bind((self.server, self.port))
 
         except socket.error as e:
             print(str(e))
@@ -150,7 +147,7 @@ class Server:
 
 
 if __name__ == "__main__":
-    s = Server(5555)
+    s = Server(port=5555, server='')
     currentId = "0"
     pos = s.build_object_pos()
     s.create_socket()

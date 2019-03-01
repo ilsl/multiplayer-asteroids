@@ -262,39 +262,10 @@ class Game:
                                 self.spaceship.speed -= 1
                             self.spaceship.is_throttle_on = False
 
-
-
-                        # Send Network Stuff
-                        parsedvalues = self.parse_data(self, data=self.send_data())
-                        self.spaceship2.position = parsedvalues['position']
-                        self.spaceship2.angle = parsedvalues['angle']
-                        for r in range(len(self.rocks)):
-                            positionjson = "rocksposition_" + str(r)
-                            speedjson = "rockspeed_" + str(r)
-                            sizejson = "rocksize_" + str(r)
-                            directionjson = "rockdirection_" + str(r)
-                            try:
-                                self.rocks[r].position = parsedvalues[positionjson]
-                                self.rocks[r].speed = parsedvalues[speedjson]
-                                self.rocks[r].size = parsedvalues[sizejson]
-                                self.rocks[r].direction = parsedvalues[directionjson]
-                            except KeyError:
-                                #Rock r doesn't exist yet
-                                pass
-
-                        for r in range(len(self.spaceship.active_missiles)):
-                            missileposition = "missileposition_" + str(r)
-                            missilespeed = "missilespeed_" + str(r)
-                            missilesize = "missilesize_" + str(r)
-                            missiledirection = "missiledirection_" + str(r)
-                            try:
-                                self.spaceship.active_missiles[r].position = parsedvalues[missileposition]
-                                self.spaceship.active_missiles[r].speed = parsedvalues[missilespeed]
-                                # self.spaceship.active_missiles[r].size = parsedvalues[missilesize]
-                                self.spaceship.active_missiles[r].direction = parsedvalues[missiledirection]
-                            except KeyError:
-                                #Missile r doesn't exist yet
-                                pass
+                        # IJ Start: Send Network Stuff ####################
+                        parsed_values = self.parse_data(self, data=self.send_data())
+                        self.update_object_positions(parsed_values)
+                        # IJ End: Send Network Stuff ####################
 
                         # if there are any rocks, do their physics
                         if len(self.rocks) > 0:
@@ -346,7 +317,34 @@ class Game:
             else:
                 pass  # an event type we don't handle
 
+    def update_object_positions(self, parsed_values):
+        self.spaceship2.position = parsed_values['position']
+        self.spaceship2.angle = parsed_values['angle']
+        for r in range(len(self.rocks)):
+            positionjson = "rocksposition_" + str(r)
+            speedjson = "rockspeed_" + str(r)
+            sizejson = "rocksize_" + str(r)
+            directionjson = "rockdirection_" + str(r)
+            try:
+                self.rocks[r].position = parsed_values[positionjson]
+                self.rocks[r].speed = parsed_values[speedjson]
+                self.rocks[r].size = parsed_values[sizejson]
+                self.rocks[r].direction = parsed_values[directionjson]
+            except KeyError:
+                # Rock r doesn't exist yet
+                pass
 
+        for r in range(len(self.spaceship.active_missiles)):
+            missileposition = "missileposition_" + str(r)
+            missilespeed = "missilespeed_" + str(r)
+            missiledirection = "missiledirection_" + str(r)
+            try:
+                self.spaceship.active_missiles[r].position = parsed_values[missileposition]
+                self.spaceship.active_missiles[r].speed = parsed_values[missilespeed]
+                self.spaceship.active_missiles[r].direction = parsed_values[missiledirection]
+            except KeyError:
+                # Missile r doesn't exist yet
+                pass
 
     def send_data(self):
         """
@@ -415,6 +413,8 @@ class Game:
 
         except:
             data_arr_filtered = {'position': data_arr['position'], 'angle': data_arr['angle']}
+            self.spaceship2.position = data_arr['position']
+
             return data_arr_filtered
 
     def rocks_physics(self):

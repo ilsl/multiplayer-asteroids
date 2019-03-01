@@ -26,9 +26,6 @@ class Server:
         s.listen(2)
         print("Waiting for a connection")
 
-        # Set the first Client to connect with an id of 0
-
-
         while True:
             conn, addr = s.accept()
             print("Connected to: ", addr)
@@ -79,10 +76,12 @@ class Server:
         queue.put(None)  # Using None to indicate no more data on queue
         queue_active = True
 
+        # Get the globally set currentId and pos
         global currentId, pos
 
         # send the serialized data across the network
         conn.send(str.encode(currentId))
+
         # This sets the 2nd Clients id
         currentId = "1"
         socket_active = True
@@ -120,6 +119,7 @@ class Server:
                     reply = reply.encode()
 
                 conn.sendall(reply)
+
             except:
                 break
             # Get item from queue without blocking if possible
@@ -138,17 +138,17 @@ class Server:
             if do_sleep:
                 time.sleep(0.1)
 
-
         print("Connection Closed")
         conn.close()
 
-    def process_queue_item(self,item):
+    def process_queue_item(self, item):
         print('Got queue item: %r' % item)
 
 
 if __name__ == "__main__":
-    s = Server(port=5555, server='')
+    running_server = Server(port=5555, server='')
+    # Set the first Client to connect with an id of 0
     currentId = "0"
-    pos = s.build_object_pos()
-    s.create_socket()
-
+    # Get the object poitions of a server
+    pos = running_server.build_object_pos()
+    running_server.create_socket()

@@ -10,6 +10,7 @@ class Server:
     def __init__(self, port, server):
         self.port = port
         self.server = server
+        self.number_of_connections = 0
 
     def create_socket(self):
         """
@@ -32,6 +33,7 @@ class Server:
         while True:
             conn, addr = s.accept()
             print("Connected to: ", addr)
+            self.number_of_connections = self.number_of_connections + 1
 
             start_new_thread(self.threaded_client, (conn,))
 
@@ -89,9 +91,11 @@ class Server:
 
         # send the serialized data across the network
         conn.send(str.encode(currentId))
-
         # This sets the 2nd Clients id
-        currentId = "1"
+        if self.number_of_connections > 2:
+            currentId = "0"
+        else:
+            currentId = "1"
         socket_active = True
 
         while True:
@@ -114,7 +118,6 @@ class Server:
                     dataid = json.loads(dataid)
                     id = dataid['id']
                     id = int(id[2])
-                    print('pos',pos)
                     pos[id] = reply
 
                     # Use the alternative id to the one received as this will be the other players response.

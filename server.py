@@ -10,7 +10,7 @@ class Server:
     def __init__(self, port, server):
         self.port = port
         self.server = server
-        self.number_of_connections = 0
+        self.number_of_connections = 0   # Dead Reckoning
 
     def create_socket(self):
         """

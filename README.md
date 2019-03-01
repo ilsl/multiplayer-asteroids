@@ -2,12 +2,12 @@
 
 This game allows 2 players to play against each other on the classic arcade game: asteroids.
 
-This works on a shared local network but can easily be configured to be hosted. It uses thge following technologies:
+This works on a shared local network but can easily be configured to be hosted. It uses thge following techniques:
 * sockets
 * threads
 * Queue (Artificial Network Delay) on server
 * pygame frame rate (Bucket Synchronization) on client
-* Dead Reckoning 
+* Dead Reckoning - If a player goes offline and then re connects, then their original id is assigned back to them
 
 This project uses the code from the following github repository as a base:
 

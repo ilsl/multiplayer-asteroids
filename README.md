@@ -2,7 +2,10 @@
 
 This game allows 2 players to play against each other on the classic arcade game: asteroids.
 
-This works on a shared local network but can easily be configured to be hosted. 
+This works on a shared local network but can easily be configured to be hosted. It uses thge following technologies:
+* sockets
+* threads
+* Queue (bucket synchonization)
 
 This project uses the code from the following github repository as a base:
 

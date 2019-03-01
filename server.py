@@ -32,7 +32,6 @@ class Server:
 
             start_new_thread(self.threaded_client, (conn,))
 
-
     # The below initialises all objects on screen: Missile, Rock and ship.
     # This for loop creates a key specific to that rock. E.g rock 5 on screen would have a property of rockpositions_5
     def build_object_pos(self):
@@ -149,6 +148,6 @@ if __name__ == "__main__":
     running_server = Server(port=5555, server='')
     # Set the first Client to connect with an id of 0
     currentId = "0"
-    # Get the object poitions of a server
+    # Get the object positions of a server
     pos = running_server.build_object_pos()
     running_server.create_socket()

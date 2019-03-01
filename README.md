@@ -19,4 +19,4 @@ README.py
 I have also added the following functions to the original game.py:
 send_data
 parse_data
-update_object_positions
+update_object_positionsx 

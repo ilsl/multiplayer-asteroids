@@ -32,7 +32,7 @@ I have also added the following functions to the original game.py:
 
 To run the game, the server first needs to be started:
 ```
-python run_server.py
+python server.py
 ```
 Then for Player 1 to join the game:
 ```
